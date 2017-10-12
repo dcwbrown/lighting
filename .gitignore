@@ -4,7 +4,7 @@
 *.map
 *.dump
 *.o
-RRF24/*
+RF24/*
 outline/*
 work/*
 controller/bak/*
