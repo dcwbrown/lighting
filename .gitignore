@@ -1,0 +1,12 @@
+*.sublime-*
+*.exe
+*.list
+*.map
+*.dump
+*.o
+RRF24/*
+outline/*
+work/*
+controller/bak/*
+controller/sim/*
+ui,*
