@@ -53,7 +53,8 @@ void InitWireless() {
   WriteRfCmd(FLUSH_TX);
   WriteRfReg(CONFIG,     0x0E);     // Power up in TX mode with 2 byte CRCs
   delay(5);
-  WriteRfReg(SETUP_RETR, 0x34);     // 1ms per retry, 4 retries
+  WriteRfReg(EN_AA,      0x00);     // Disable auto acknowledgement on all data pipes
+//WriteRfReg(SETUP_RETR, 0x34);     // 1ms per retry, 4 retries
   WriteRfReg(RF_SETUP,   0x04);     // 1Mbps data rate, -6dBm power
   WriteRfReg(FEATURE,    0x00);     // Disable EN_DPL, EN_ACK_PAY and EN_DYN_ACK
   WriteRfReg(DYNPD,      0x00);     // Disable dynamic payload on all pipes
@@ -64,13 +65,9 @@ void InitWireless() {
   WriteRfReg(CONFIG,     0x0E);     // Power up in TX mode with 2 byte CRCs
   delay(5);
 
-  WriteRfReg(EN_AA, 0x03);     // Enable auto acknowledge on pipes 0 and 1
+//WriteRfReg(EN_AA, 0x03);     // Enable auto acknowledge on pipes 0 and 1
 
-  //  // Receive on P1 at address "25925"
-  //  WriteRfAdr(RX_ADDR_P1, (u8*)"25925");
-  //  WriteRfReg(RX_PW_P1, 4);     // Payload length
-
-  WriteRfReg(EN_RXADDR, 3);    // Enable Rx on pipes 0 (for tx ack) and 1
+//WriteRfReg(EN_RXADDR, 3);    // Enable Rx on pipes 0 (for tx ack) and 1
 }
 
 u8 writeAddr[5] = {"x5925"};

@@ -234,7 +234,7 @@ void CheckSendStatus() {
 }
 
 void CheckUpdate() {
-  for (u8 i=0; i<countof(update); i++) {
+  for (u8 i=0; i<1 /*countof(update)*/; i++) {
     if (update[i]) {
       destination = i;
       RfWrite(i, colours[i]);
@@ -242,6 +242,7 @@ void CheckUpdate() {
       break;
     }
   }
+  delay(10); // Delay during radio noise caused by update of led strips
 }
 
 void SetColour(u8 knob) {

@@ -360,7 +360,8 @@ WirelessInit:
           WriteRfCmd FLUSH_TX
           WriteRfReg CONFIG,     0x05  ; Power down (in RX mode) with 2 byte CRCs
           MSEC  5
-          WriteRfReg SETUP_RETR, 0x34  ; 1ms per retry, 4 retries
+;         WriteRfReg SETUP_RETR, 0x34  ; 1ms per retry, 4 retries
+          WriteRfReg EN_AA,      0x00  ; Disable auto acknowledgement
           WriteRfReg RF_SETUP,   0x04  ; 1Mbps data rate, -6dBm power
           WriteRfReg FEATURE,    0x00  ; Disable EN_DPL, EN_ACK_PAY and EN_DYN_ACK
           WriteRfReg DYNPD,      0x00  ; Disable dynamic payload on all pipes
@@ -375,23 +376,25 @@ WirelessInit:
           ldi    r16,0x20|RX_ADDR_P1
           rcall  spi
 
-          ldi   r16,1                  ; Our address is stored in eeprom location 1
-          rcall ReadEEProm
-          subi  r16,-'1'
-          rcall  spi
+;         ldi   r16,1                  ; Our address is stored in eeprom location 1
+;         rcall ReadEEProm
+;         subi  r16,-'1'
+          
+          ldi   r16,'1'
+          rcall spi
 
-          ldi    r16,'5'
-          rcall  spi
+          ldi   r16,'5'
+          rcall spi
 
-          ldi    r16,'9'
-          rcall  spi
+          ldi   r16,'9'
+          rcall spi
 
-          ldi    r16,'2'
-          rcall  spi
+          ldi   r16,'2'
+          rcall spi
 
-          ldi    r16,'5'
-          rcall  spi
-          sbi    PORTB,CSN   ; Activate nRF24L01+ chip select
+          ldi   r16,'5'
+          rcall spi
+          sbi   PORTB,CSN   ; Activate nRF24L01+ chip select
 
           WriteRfReg RX_PW_P1,   4     ; Payload length
           WriteRfReg EN_RXADDR,  2     ; Enable Rx on pipe 1
@@ -502,7 +505,7 @@ led2:     rcall Status       ; Wait for completion status
 
 ;         Read updated led settings
 
-led4:     cbi    PORTB,CSN   ; Activate nRF24L01+ chip select
+led4:     cbi   PORTB,CSN    ; Activate nRF24L01+ chip select
           ldi   r16,0x61     ; Read RX payload
           rcall spi
           ldi   r16,0xFF
@@ -519,13 +522,17 @@ led4:     cbi    PORTB,CSN   ; Activate nRF24L01+ chip select
           mov   r15,r16      ; Warm white
           sbi    PORTB,CSN   ; Activate nRF24L01+ chip select
 
-;         Send the updated colour setting to all the leds in the strip
+;         If there are any more settings in our received packet pipeline
+;         we'll want to pick them up now so that we're always using the
+;         most recent setting.
 
-          rcall SetColour
-          WriteRfReg STATUS,0x40 ; Clear RX_DR data ready interrupt flag
           ReadRfReg FIFO_STATUS
           sbrs  r16,0        ; Skip if all pending payloads have been read
-          rjmp  led4         ; Immediately load next payload
+          rjmp  led4         ; Immediately read next payload
+
+          WriteRfReg STATUS,0x40 ; Clear RX_DR data ready interrupt flag
+
+          rcall SetColour    ; Send the updated colour to all leds
 
 ;         Go back and wait for another packet
 
